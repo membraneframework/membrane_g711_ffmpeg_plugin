@@ -68,7 +68,7 @@ static int get_frames(UnifexEnv *env, AVPacket *pkt,
       frames = unifex_realloc(frames, (*max_frames) * sizeof(*frames));
     }
 
-    size_t payload_size = (size_t)frame->linesize[0];
+    size_t payload_size = frame->nb_samples * av_get_bytes_per_sample(state->codec_ctx->sample_fmt);
 
     frames[*frame_cnt] = unifex_alloc(sizeof(UnifexPayload));
 
