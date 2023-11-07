@@ -48,7 +48,6 @@ defmodule Membrane.G711.FFmpeg.Decoder do
 
   @impl true
   def handle_stream_format(:input, _stream_format, _ctx, state) do
-    # TODO: handle :PCMU
     with buffers <- flush_decoder_if_exists(state),
          {:ok, new_decoder_ref} <- Native.create() do
       stream_format = generate_stream_format(new_decoder_ref)

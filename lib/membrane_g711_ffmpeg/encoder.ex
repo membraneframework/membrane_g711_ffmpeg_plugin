@@ -81,7 +81,6 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   defp generate_stream_format(_state) do
-    # TODO: handle :PCMU
     %G711{encoding: :PCMA}
   end
 end
