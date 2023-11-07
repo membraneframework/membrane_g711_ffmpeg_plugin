@@ -1,12 +1,13 @@
-defmodule Membrane.Template.Mixfile do
+defmodule Membrane.G711.FFmpeg.Mixfile do
   use Mix.Project
 
   @version "0.1.0"
-  @github_url "https://github.com/membraneframework/membrane_template_plugin"
+  @github_url "https://github.com/jellyfish-dev/membrane_g711_ffmpeg_plugin"
 
   def project do
     [
-      app: :membrane_template_plugin,
+      app: :membrane_g711_ffmpeg_plugin,
+      compilers: [:unifex, :bundlex] ++ Mix.compilers(),
       version: @version,
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -15,11 +16,11 @@ defmodule Membrane.Template.Mixfile do
       dialyzer: dialyzer(),
 
       # hex
-      description: "Template Plugin for Membrane Multimedia Framework",
+      description: "Membrane G711 decoder and encoder based on FFmpeg",
       package: package(),
 
       # docs
-      name: "Membrane Template plugin",
+      name: "Membrane G711 FFmpeg Plugin",
       source_url: @github_url,
       docs: docs()
     ]
@@ -36,10 +37,13 @@ defmodule Membrane.Template.Mixfile do
 
   defp deps do
     [
+      {:bundlex, "~> 1.2.0"},
+      {:unifex, "~> 1.1.0"},
       {:membrane_core, "~> 0.12.9"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
-      {:credo, ">= 0.0.0", only: :dev, runtime: false}
+      {:membrane_raw_audio_format, "~> 0.11.0"},
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
+      {:credo, "~> 1.6", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1", only: :dev, runtime: false}
     ]
   end
 
@@ -62,8 +66,10 @@ defmodule Membrane.Template.Mixfile do
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @github_url,
-        "Membrane Framework Homepage" => "https://membraneframework.org"
-      }
+        "Membrane Framework Homepage" => "https://membrane.stream"
+      },
+      files: ["lib", "mix.exs", "README*", "LICENSE*", ".formatter.exs", "bundlex.exs", "c_src"],
+      exclude_patterns: [~r"c_src/.*/_generated.*"]
     ]
   end
 
@@ -73,7 +79,7 @@ defmodule Membrane.Template.Mixfile do
       extras: ["README.md", "LICENSE"],
       formatters: ["html"],
       source_ref: "v#{@version}",
-      nest_modules_by_prefix: [Membrane.Template]
+      nest_modules_by_prefix: [Membrane.G711.FFmpeg]
     ]
   end
 end
