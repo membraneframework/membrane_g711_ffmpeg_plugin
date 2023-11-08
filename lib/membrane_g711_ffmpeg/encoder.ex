@@ -13,19 +13,18 @@ defmodule Membrane.G711.FFmpeg.Encoder do
 
   use Membrane.Filter
 
+  require Membrane.G711
+
   alias __MODULE__.Native
   alias Membrane.G711.FFmpeg.Common
   alias Membrane.{G711, RawAudio}
-
-  @g711_sample_rate 8000
-  @g711_num_channels 1
 
   def_input_pad :input,
     demand_mode: :auto,
     demand_unit: :buffers,
     accepted_format: %RawAudio{
-      channels: @g711_num_channels,
-      sample_rate: @g711_sample_rate,
+      channels: G711.num_channels(),
+      sample_rate: G711.sample_rate(),
       sample_format: :s16le
     }
 

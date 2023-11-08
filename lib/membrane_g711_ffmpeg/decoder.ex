@@ -7,14 +7,12 @@ defmodule Membrane.G711.FFmpeg.Decoder do
 
   use Membrane.Filter
 
+  require Membrane.G711
   require Membrane.Logger
 
   alias __MODULE__.Native
   alias Membrane.G711.FFmpeg.Common
   alias Membrane.{G711, RawAudio, RemoteStream}
-
-  @g711_sample_rate 8000
-  @g711_num_channels 1
 
   def_input_pad :input,
     demand_mode: :auto,
@@ -24,8 +22,8 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   def_output_pad :output,
     demand_mode: :auto,
     accepted_format: %RawAudio{
-      channels: @g711_num_channels,
-      sample_rate: @g711_sample_rate
+      channels: G711.num_channels(),
+      sample_rate: G711.sample_rate()
     }
 
   @impl true
@@ -78,8 +76,8 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   defp generate_stream_format(decoder_ref) do
     with {:ok, sample_format} <- Native.get_metadata(decoder_ref) do
       %RawAudio{
-        channels: @g711_num_channels,
-        sample_rate: @g711_sample_rate,
+        channels: G711.num_channels(),
+        sample_rate: G711.sample_rate(),
         sample_format: sample_format
       }
     else

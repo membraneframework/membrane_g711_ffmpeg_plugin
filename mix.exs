@@ -40,7 +40,7 @@ defmodule Membrane.G711.FFmpeg.Mixfile do
       {:bundlex, "~> 1.2.0"},
       {:unifex, "~> 1.1.0"},
       {:membrane_core, "~> 0.12.9"},
-      {:membrane_g711_format, github: "jellyfish-dev/membrane_g711_format", branch: "initial"},
+      {:membrane_g711_format, "~> 0.1.0"},
       {:membrane_raw_audio_format, "~> 0.11.0"},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
       {:credo, "~> 1.6", only: :dev, runtime: false},
