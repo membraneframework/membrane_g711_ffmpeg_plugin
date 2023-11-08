@@ -16,5 +16,4 @@ spec get_metadata(state) ::
        {:ok :: label, sample_fmt :: atom}
        | {:error :: label, :sample_fmt :: label}
 
-# TODO: do we need this?
-# dirty :cpu, decode: 2, flush: 1
+dirty :cpu, decode: 2, flush: 1
