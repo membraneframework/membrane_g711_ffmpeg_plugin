@@ -5,7 +5,7 @@
 Logger.configure(level: :info)
 
 Mix.install([
-  :membrane_g711_ffmpeg_plugin,
+  {:membrane_g711_ffmpeg_plugin, path: __DIR__ |> Path.join("..") |> Path.expand(), override: :true},
   :membrane_file_plugin,
   :req
 ])
@@ -19,12 +19,30 @@ defmodule Decoding.Pipeline do
   @impl true
   def handle_init(_ctx, _opts) do
     structure =
-      child(%Membrane.File.Source{chunk_size: 40_960, location: "input.al"})
-      |> child(Membrane.G711.FFmpeg.Decoder)
-      |> child(%Membrane.File.Sink{location: "output.raw"})
+      child(:source, %Membrane.File.Source{chunk_size: 40_960, location: "input.al"})
+      |> child(:decoder, Membrane.G711.FFmpeg.Decoder)
+      |> child(:sink, %Membrane.File.Sink{location: "output.raw"})
 
     {[spec: structure], %{}}
   end
+
+  @impl true
+  def handle_element_end_of_stream(:sink, _pad, _ctx, state) do
+    {[terminate: :shutdown], state}
+  end
+
+  @impl true
+  def handle_element_end_of_stream(_child, _pad, _ctx, state) do
+    {[], state}
+  end
 end
 
-Membrane.Pipeline.start_link(Decoding.Pipeline)
+# Start and monitor the pipeline
+{:ok, _supervisor_pid, pipeline_pid} = Decoding.Pipeline.start_link()
+ref = Process.monitor(pipeline_pid)
+
+# Wait for the pipeline to finish
+receive do
+  {:DOWN, ^ref, :process, _pipeline_pid, _reason} ->
+    System.stop()
+end
