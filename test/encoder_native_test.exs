@@ -6,18 +6,22 @@ defmodule Encoder.NativeTest do
 
   @fixtures_dir "test/fixtures/encode/"
 
-  test "Encode 8000 A-law samples from s16le" do
+  test "Encode A-law from s16le" do
     in_path = Path.join(@fixtures_dir, "input-s16le.raw")
     ref_path = Path.join(@fixtures_dir, "reference.al")
 
     assert {:ok, file} = File.read(in_path)
     assert {:ok, encoder_ref} = Native.create(:s16le)
-    assert <<frame::bytes-size(16_000), _rest::binary>> = file
-    assert {:ok, [frame]} = Native.encode(frame, encoder_ref)
+    assert {:ok, iodata} = Native.encode(file, encoder_ref)
     assert {:ok, []} = Native.flush(encoder_ref)
-    assert Payload.size(frame) == 8_000
+
+    out_file =
+      iodata
+      |> Enum.map(&Payload.to_binary/1)
+      |> IO.iodata_to_binary()
+
     assert {:ok, ref_file} = File.read(ref_path)
-    assert <<ref_frame::bytes-size(8_000), _rest::binary>> = ref_file
-    assert Payload.to_binary(frame) == ref_frame
+    assert byte_size(out_file) == byte_size(ref_file)
+    assert out_file == ref_file
   end
 end

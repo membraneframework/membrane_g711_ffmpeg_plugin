@@ -29,6 +29,7 @@ defmodule DecoderTest do
   defp assert_files_equal(file_a, file_b) do
     assert {:ok, a} = File.read(file_a)
     assert {:ok, b} = File.read(file_b)
+    assert byte_size(a) == byte_size(b)
     assert a == b
   end
 
@@ -43,7 +44,7 @@ defmodule DecoderTest do
 
   describe "DecodingPipeline should" do
     @describetag :tmp_dir
-    test "decode a 120s long A-law file", ctx do
+    test "decode a 21s long A-law file", ctx do
       perform_decoding_test("al", ctx.tmp_dir)
     end
   end

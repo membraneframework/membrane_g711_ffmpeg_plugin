@@ -37,6 +37,7 @@ defmodule EncoderTest do
   defp assert_files_equal(file_a, file_b) do
     assert {:ok, a} = File.read(file_a)
     assert {:ok, b} = File.read(file_b)
+    assert byte_size(a) == byte_size(b)
     assert a == b
   end
 
@@ -51,7 +52,7 @@ defmodule EncoderTest do
 
   describe "EncodingPipeline should" do
     @describetag :tmp_dir
-    test "encode a 120s long raw s16le file to A-law", ctx do
+    test "encode a 21s long raw s16le file to A-law", ctx do
       perform_encoding_test("al", ctx.tmp_dir)
     end
   end
