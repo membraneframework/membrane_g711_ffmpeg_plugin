@@ -2,6 +2,23 @@ version: 2.1
 orbs:
   elixir: membraneframework/elixir@1
 
+executors:
+  examples-executor:
+    resource_class: large
+    docker:
+      - image: membraneframeworklabs/docker_membrane:v2.2.0
+    working_directory: ~/app
+
+jobs:
+  run-examples:
+    executor:
+      - name: examples-executor
+    steps:
+      - checkout:
+          path: ~/app
+      - run: elixir examples/encode_example.exs
+      - run: elixir examples/decode_example.exs
+
 workflows:
   version: 2
   build:
@@ -16,11 +33,15 @@ workflows:
       - elixir/lint:
           filters:
             <<: *filters
+      - run-examples:
+          filters:
+            <<: *filters
       - elixir/hex_publish:
           requires:
             - elixir/build_test
             - elixir/test
             - elixir/lint
+            - run-examples
           context:
             - Deployment
           filters:
