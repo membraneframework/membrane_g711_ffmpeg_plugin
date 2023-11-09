@@ -5,14 +5,19 @@
 Logger.configure(level: :info)
 
 Mix.install([
-  {:membrane_g711_ffmpeg_plugin, path: __DIR__ |> Path.join("..") |> Path.expand(), override: :true},
+  {:membrane_g711_ffmpeg_plugin,
+   path: __DIR__ |> Path.join("..") |> Path.expand(), override: true},
   :membrane_raw_audio_parser_plugin,
   :membrane_raw_audio_format,
   :membrane_file_plugin,
   :req
 ])
 
-raw_audio = Req.get!("https://raw.githubusercontent.com/membraneframework/static/gh-pages/samples/beep-s16le-8kHz-mono.raw").body
+raw_audio =
+  Req.get!(
+    "https://raw.githubusercontent.com/membraneframework/static/gh-pages/samples/beep-s16le-8kHz-mono.raw"
+  ).body
+
 File.write!("input.raw", raw_audio)
 
 defmodule Encoding.Pipeline do

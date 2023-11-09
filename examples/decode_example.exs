@@ -5,12 +5,17 @@
 Logger.configure(level: :info)
 
 Mix.install([
-  {:membrane_g711_ffmpeg_plugin, path: __DIR__ |> Path.join("..") |> Path.expand(), override: :true},
+  {:membrane_g711_ffmpeg_plugin,
+   path: __DIR__ |> Path.join("..") |> Path.expand(), override: true},
   :membrane_file_plugin,
   :req
 ])
 
-g711_alaw = Req.get!("https://raw.githubusercontent.com/membraneframework/static/gh-pages/samples/beep-alaw-8kHz-mono.raw").body
+g711_alaw =
+  Req.get!(
+    "https://raw.githubusercontent.com/membraneframework/static/gh-pages/samples/beep-alaw-8kHz-mono.raw"
+  ).body
+
 File.write!("input.al", g711_alaw)
 
 defmodule Decoding.Pipeline do
