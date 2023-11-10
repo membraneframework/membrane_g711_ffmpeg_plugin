@@ -24,24 +24,9 @@ end
 
 This package depends on the [ffmpeg](https://www.ffmpeg.org) libraries. The precompiled builds will be pulled and linked automatically. However, should there be any problems, consider installing it manually.
 
-### Manual instalation of dependencies
-#### Ubuntu
+### Manual installation of dependencies
 
-```bash
-sudo apt-get install libavcodec-dev libavformat-dev libavutil-dev
-```
-
-#### Arch/Manjaro
-
-```bash
-pacman -S ffmpeg
-```
-
-#### MacOS
-
-```bash
-brew install ffmpeg
-```
+Refer to [ffmpeg page](https://www.ffmpeg.org) for detailed installation instructions.
 
 ## Usage
 

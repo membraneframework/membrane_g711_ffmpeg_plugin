@@ -4,7 +4,7 @@ orbs:
 
 executors:
   examples-executor:
-    resource_class: large
+    resource_class: medium
     docker:
       - image: membraneframeworklabs/docker_membrane:v2.2.0
     working_directory: ~/app
