@@ -1,23 +1,21 @@
-# Membrane Template Plugin
+# Membrane G.711 FFmpeg plugin
 
-[![Hex.pm](https://img.shields.io/hexpm/v/membrane_template_plugin.svg)](https://hex.pm/packages/membrane_template_plugin)
-[![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_template_plugin)
-[![CircleCI](https://circleci.com/gh/membraneframework/membrane_template_plugin.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane_template_plugin)
+[![Hex.pm](https://img.shields.io/hexpm/v/membrane_g711_ffmpeg_plugin.svg)](https://hex.pm/packages/membrane_g711_ffmpeg_plugin)
+[![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_g711_ffmpeg_plugin)
+[![CircleCI](https://circleci.com/gh/jellyfish-dev/membrane_g711_ffmpeg_plugin.svg?style=svg)](https://circleci.com/gh/jellyfish-dev/membrane_g711_ffmpeg_plugin)
 
-This repository contains a template for new plugins.
+TODO: write me
 
-Check out different branches for other flavours of template.
-
-It is part of [Membrane Multimedia Framework](https://membraneframework.org).
+It is part of [Membrane Multimedia Framework](https://membrane.stream).
 
 ## Installation
 
-The package can be installed by adding `membrane_template_plugin` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `membrane_g711_ffmpeg_plugin` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:membrane_template_plugin, "~> 0.1.0"}
+    {:membrane_g711_ffmpeg_plugin, "~> 0.1.0"}
   ]
 end
 ```
@@ -28,7 +26,7 @@ TODO
 
 ## Copyright and License
 
-Copyright 2020, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane_template_plugin)
+Copyright 2023, [Software Mansion](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane_template_plugin)
 
 [![Software Mansion](https://logo.swmansion.com/logo?color=white&variant=desktop&width=200&tag=membrane-github)](https://swmansion.com/?utm_source=git&utm_medium=readme&utm_campaign=membrane_template_plugin)
 
