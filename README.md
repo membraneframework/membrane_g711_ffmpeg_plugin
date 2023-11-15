@@ -4,7 +4,9 @@
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_g711_ffmpeg_plugin)
 [![CircleCI](https://circleci.com/gh/jellyfish-dev/membrane_g711_ffmpeg_plugin.svg?style=svg)](https://circleci.com/gh/jellyfish-dev/membrane_g711_ffmpeg_plugin)
 
-TODO: write me
+This package provides G.711 audio decoder and encoder, based on [ffmpeg](https://www.ffmpeg.org).
+
+At the moment, only G.711 A-law is supported.
 
 It is part of [Membrane Multimedia Framework](https://membrane.stream).
 
@@ -20,9 +22,15 @@ def deps do
 end
 ```
 
+This package depends on the [ffmpeg](https://www.ffmpeg.org) libraries. The precompiled builds will be pulled and linked automatically. However, should there be any problems, consider installing it manually.
+
+### Manual installation of dependencies
+
+Refer to [ffmpeg page](https://www.ffmpeg.org) for detailed installation instructions.
+
 ## Usage
 
-TODO
+For usage examples, refer to [the scripts in `examples/` directory](https://github.com/jellyfish-dev/membrane_g711_ffmpeg_plugin/tree/main/examples/).
 
 ## Copyright and License
 
