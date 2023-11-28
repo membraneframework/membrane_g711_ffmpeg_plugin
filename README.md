@@ -4,7 +4,7 @@
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/membrane_g711_ffmpeg_plugin)
 [![CircleCI](https://circleci.com/gh/jellyfish-dev/membrane_g711_ffmpeg_plugin.svg?style=svg)](https://circleci.com/gh/jellyfish-dev/membrane_g711_ffmpeg_plugin)
 
-This package provides G.711 audio decoder and encoder, based on [ffmpeg](https://www.ffmpeg.org).
+This package provides G.711 audio decoder, encoder and parser. The decoder and encoder are based on [ffmpeg](https://www.ffmpeg.org).
 
 At the moment, only G.711 A-law is supported.
 
