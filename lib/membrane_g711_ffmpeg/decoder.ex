@@ -17,7 +17,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   def_input_pad :input,
     demand_mode: :auto,
     demand_unit: :buffers,
-    accepted_format: any_of(%RemoteStream{type: :bytestream}, %G711{encoding: :PCMA})
+    accepted_format: any_of(%RemoteStream{}, %G711{encoding: :PCMA})
 
   def_output_pad :output,
     demand_mode: :auto,
