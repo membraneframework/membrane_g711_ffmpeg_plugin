@@ -52,7 +52,7 @@ defmodule Encoding.Pipeline do
 end
 
 # Start and monitor the pipeline
-{:ok, _supervisor_pid, pipeline_pid} = Encoding.Pipeline.start_link()
+{:ok, _supervisor_pid, pipeline_pid} = Membrane.Pipeline.start_link(Encoding.Pipeline)
 ref = Process.monitor(pipeline_pid)
 
 # Wait for the pipeline to finish
