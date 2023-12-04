@@ -43,12 +43,12 @@ defmodule Membrane.G711.FFmpeg.Parser do
               ]
 
   def_input_pad :input,
-    demand_mode: :auto,
+    flow_control: :auto,
     accepted_format: any_of(G711, RemoteStream),
     availability: :always
 
   def_output_pad :output,
-    demand_mode: :auto,
+    flow_control: :auto,
     availability: :always,
     accepted_format: G711
 
@@ -90,7 +90,7 @@ defmodule Membrane.G711.FFmpeg.Parser do
   end
 
   @impl true
-  def handle_process(:input, buffer, _ctx, %{overwrite_pts?: overwrite_pts?} = state) do
+  def handle_buffer(:input, buffer, _ctx, %{overwrite_pts?: overwrite_pts?} = state) do
     parsed_payload = buffer.payload
 
     if parsed_payload == <<>> do

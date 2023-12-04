@@ -39,11 +39,11 @@ defmodule Membrane.G711.FFmpeg.Mixfile do
     [
       {:bundlex, "~> 1.2.0"},
       {:unifex, "~> 1.1.0"},
-      {:membrane_core, "~> 0.12.9"},
+      {:membrane_core, "~> 1.0"},
       {:membrane_g711_format, "~> 0.1.0"},
-      {:membrane_raw_audio_format, "~> 0.11.0"},
-      {:membrane_file_plugin, "~> 0.14.0", only: :test},
-      {:membrane_raw_audio_parser_plugin, "~> 0.3.0", only: :test},
+      {:membrane_raw_audio_format, "~> 0.12.0"},
+      {:membrane_file_plugin, "~> 0.16.0", only: :test},
+      {:membrane_raw_audio_parser_plugin, "~> 0.4.0", only: :test},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: :dev, runtime: false}

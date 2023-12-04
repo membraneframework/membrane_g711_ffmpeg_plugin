@@ -20,8 +20,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   alias Membrane.{G711, RawAudio}
 
   def_input_pad :input,
-    demand_mode: :auto,
-    demand_unit: :buffers,
+    flow_control: :auto,
     accepted_format: %RawAudio{
       channels: G711.num_channels(),
       sample_rate: G711.sample_rate(),
@@ -29,7 +28,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
     }
 
   def_output_pad :output,
-    demand_mode: :auto,
+    flow_control: :auto,
     accepted_format: %G711{encoding: :PCMA}
 
   @impl true
@@ -40,7 +39,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   @impl true
-  def handle_process(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, buffer, _ctx, state) do
     case Native.encode(buffer.payload, state.encoder_ref) do
       {:ok, frames} ->
         {Common.wrap_frames(frames), state}

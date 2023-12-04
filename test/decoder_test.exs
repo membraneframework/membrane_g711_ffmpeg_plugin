@@ -19,7 +19,7 @@ defmodule DecoderTest do
 
   defp make_pipeline(in_path, out_path) do
     Pipeline.start_link_supervised!(
-      structure:
+      spec:
         child(:file_src, %Membrane.File.Source{chunk_size: 40_960, location: in_path})
         |> child(:decoder, Decoder)
         |> child(:sink, %Membrane.File.Sink{location: out_path})
@@ -37,7 +37,6 @@ defmodule DecoderTest do
     {in_path, ref_path, out_path} = prepare_paths(extension, tmp_dir)
 
     pid = make_pipeline(in_path, out_path)
-    assert_pipeline_play(pid)
     assert_end_of_stream(pid, :sink, :input, @end_of_stream_timeout_ms)
     assert_files_equal(out_path, ref_path)
   end

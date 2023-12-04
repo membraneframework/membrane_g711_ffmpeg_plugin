@@ -15,12 +15,11 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   alias Membrane.{G711, RawAudio, RemoteStream}
 
   def_input_pad :input,
-    demand_mode: :auto,
-    demand_unit: :buffers,
+    flow_control: :auto,
     accepted_format: any_of(%RemoteStream{}, %G711{encoding: :PCMA})
 
   def_output_pad :output,
-    demand_mode: :auto,
+    flow_control: :auto,
     accepted_format: %RawAudio{
       channels: G711.num_channels(),
       sample_rate: G711.sample_rate()
@@ -34,7 +33,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   end
 
   @impl true
-  def handle_process(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, buffer, _ctx, state) do
     case Native.decode(buffer.payload, state.decoder_ref) do
       {:ok, frames} ->
         {Common.wrap_frames(frames), state}
