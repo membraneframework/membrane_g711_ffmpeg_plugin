@@ -30,7 +30,7 @@ defmodule ParserTest do
       |> child(:sink, Sink)
     ]
 
-    assert pipeline = Pipeline.start_link_supervised!(structure: structure)
+    assert pipeline = Pipeline.start_link_supervised!(spec: structure)
     assert_end_of_stream(pipeline, :sink)
 
     for i <- 0..9 do
@@ -49,7 +49,7 @@ defmodule ParserTest do
       |> child(:sink, Sink)
     ]
 
-    assert pipeline = Pipeline.start_link_supervised!(structure: structure)
+    assert pipeline = Pipeline.start_link_supervised!(spec: structure)
     assert_end_of_stream(pipeline, :sink)
 
     for i <- 0..9 do
@@ -65,7 +65,7 @@ defmodule ParserTest do
       |> child(:sink, Sink)
     ]
 
-    assert pipeline = Pipeline.start_link_supervised!(structure: structure)
+    assert pipeline = Pipeline.start_link_supervised!(spec: structure)
     assert_end_of_stream(pipeline, :sink)
   end
 end

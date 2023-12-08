@@ -43,7 +43,7 @@ defmodule Decoding.Pipeline do
 end
 
 # Start and monitor the pipeline
-{:ok, _supervisor_pid, pipeline_pid} = Decoding.Pipeline.start_link()
+{:ok, _supervisor_pid, pipeline_pid} = Membrane.Pipeline.start_link(Decoding.Pipeline)
 ref = Process.monitor(pipeline_pid)
 
 # Wait for the pipeline to finish
