@@ -106,7 +106,7 @@ UNIFEX_TERM encode(UnifexEnv *env, UnifexPayload *payload, State *state) {
   frame->nb_samples = payload->size / av_get_bytes_per_sample(state->codec_ctx->sample_fmt);
   frame->format = state->codec_ctx->sample_fmt;
 #if (LIBAVCODEC_VERSION_MAJOR < 59 || (LIBAVCODEC_VERSION_MAJOR == 59 && LIBAVCODEC_VERSION_MINOR < 24))
-  frame->channel_layout = state->codec_ctx->channel_layout;
+  frame->channels = state->codec_ctx->channels;
 #else
   av_channel_layout_copy(&frame->ch_layout, &state->codec_ctx->ch_layout);
 #endif
