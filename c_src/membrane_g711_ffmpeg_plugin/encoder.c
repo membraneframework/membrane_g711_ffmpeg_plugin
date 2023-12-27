@@ -31,7 +31,11 @@ UNIFEX_TERM create(UnifexEnv *env, char *sample_fmt) {
   }
 
   state->codec_ctx->sample_rate = G711_SAMPLE_RATE;
+#if (LIBAVCODEC_VERSION_MAJOR < 59 || (LIBAVCODEC_VERSION_MAJOR == 59 && LIBAVCODEC_VERSION_MINOR < 24))
+  state->codec_ctx->channels = G711_NUM_CHANNELS;
+#else
   state->codec_ctx->ch_layout.nb_channels = G711_NUM_CHANNELS;
+#endif
 
   if (strcmp(sample_fmt, "s16le") == 0) {
     state->codec_ctx->sample_fmt = AV_SAMPLE_FMT_S16;
@@ -101,7 +105,11 @@ UNIFEX_TERM encode(UnifexEnv *env, UnifexPayload *payload, State *state) {
 
   frame->nb_samples = payload->size / av_get_bytes_per_sample(state->codec_ctx->sample_fmt);
   frame->format = state->codec_ctx->sample_fmt;
+#if (LIBAVCODEC_VERSION_MAJOR < 59 || (LIBAVCODEC_VERSION_MAJOR == 59 && LIBAVCODEC_VERSION_MINOR < 24))
+  frame->channel_layout = state->codec_ctx->channel_layout;
+#else
   av_channel_layout_copy(&frame->ch_layout, &state->codec_ctx->ch_layout);
+#endif
 
   frame->data[0] = payload->data;
 
