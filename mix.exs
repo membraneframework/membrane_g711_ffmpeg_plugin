@@ -1,7 +1,7 @@
 defmodule Membrane.G711.FFmpeg.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @github_url "https://github.com/jellyfish-dev/membrane_g711_ffmpeg_plugin"
 
   def project do
@@ -37,8 +37,9 @@ defmodule Membrane.G711.FFmpeg.Mixfile do
 
   defp deps do
     [
-      {:bundlex, "~> 1.3.0"},
-      {:unifex, "~> 1.1.0"},
+      {:bundlex, "~> 1.4"},
+      {:unifex, "~> 1.1"},
+      {:membrane_precompiled_dependency_provider, "~> 0.1.0"},
       {:membrane_core, "~> 1.0"},
       {:membrane_g711_format, "~> 0.1.0"},
       {:membrane_raw_audio_format, "~> 0.12.0"},

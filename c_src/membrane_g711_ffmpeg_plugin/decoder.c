@@ -31,7 +31,11 @@ UNIFEX_TERM create(UnifexEnv *env) {
   }
 
   state->codec_ctx->sample_rate = G711_SAMPLE_RATE;
+#if (LIBAVCODEC_VERSION_MAJOR < 59 || (LIBAVCODEC_VERSION_MAJOR == 59 && LIBAVCODEC_VERSION_MINOR < 24))
+  state->codec_ctx->channels = G711_NUM_CHANNELS;
+#else
   state->codec_ctx->ch_layout.nb_channels = G711_NUM_CHANNELS;
+#endif
 
   if (avcodec_open2(state->codec_ctx, codec, NULL) < 0) {
     res = create_result_error(env, "codec_open");
