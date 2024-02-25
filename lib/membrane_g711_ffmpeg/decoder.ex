@@ -16,7 +16,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
 
   def_input_pad :input,
     flow_control: :auto,
-    accepted_format: any_of(%RemoteStream{}, %G711{encoding: :PCMA})
+    accepted_format: any_of(%RemoteStream{}, %G711{encoding: :PCMA}, %G711{encoding: :PCMU})
 
   def_output_pad :output,
     flow_control: :auto,
@@ -44,9 +44,11 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   end
 
   @impl true
-  def handle_stream_format(:input, _stream_format, _ctx, state) do
+  def handle_stream_format(:input, stream_format, _ctx, state) do
+    encoding = Map.get(stream_format, :encoding, :PCMA) |> to_string()
+
     with buffers <- flush_decoder_if_exists(state),
-         {:ok, new_decoder_ref} <- Native.create() do
+         {:ok, new_decoder_ref} <- Native.create(encoding) do
       stream_format = generate_stream_format(new_decoder_ref)
       actions = buffers ++ [stream_format: {:output, stream_format}]
       {actions, %{state | decoder_ref: new_decoder_ref}}

@@ -2,7 +2,7 @@ module Membrane.G711.FFmpeg.Decoder.Native
 
 state_type "State"
 
-spec create() :: {:ok :: label, state} | {:error :: label, reason :: atom}
+spec create(encoding :: string) :: {:ok :: label, state} | {:error :: label, reason :: atom}
 
 spec decode(payload, state) ::
        {:ok :: label, frames :: [payload]}
