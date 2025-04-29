@@ -2,7 +2,7 @@ module Membrane.G711.FFmpeg.Encoder.Native
 
 state_type "State"
 
-spec create(sample_fmt :: atom) ::
+spec create(sample_fmt :: atom, encoding :: atom) ::
        {:ok :: label, state} | {:error :: label, reason :: atom}
 
 spec encode(payload, state) ::

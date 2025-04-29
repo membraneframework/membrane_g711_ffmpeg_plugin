@@ -2,7 +2,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   @moduledoc """
   Membrane element that decodes audio in G711 format. It is backed by decoder from FFmpeg.
 
-  At the moment, only A-law is supported.
+  A-law and μ-law encoding formats are supported.
   """
 
   use Membrane.Filter
@@ -14,20 +14,34 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   alias Membrane.G711.FFmpeg.Common
   alias Membrane.{G711, RawAudio, RemoteStream}
 
-  def_input_pad :input,
-    flow_control: :auto,
-    accepted_format: any_of(%RemoteStream{}, %G711{encoding: :PCMA})
+  def_options(
+    encoding: [
+      spec: :PCMA | :PCMU,
+      description: "G.711 encoding to decode (A-law or μ-law)",
+      default: :PCMA
+    ]
+  )
 
-  def_output_pad :output,
+  def_input_pad(:input,
+    flow_control: :auto,
+    accepted_format:
+      any_of(%RemoteStream{}, %G711{encoding: encoding} when encoding in [:PCMA, :PCMU])
+  )
+
+  def_output_pad(:output,
     flow_control: :auto,
     accepted_format: %RawAudio{
       channels: G711.num_channels(),
       sample_rate: G711.sample_rate()
     }
+  )
 
   @impl true
-  def handle_init(_ctx, _opts) do
-    state = %{decoder_ref: nil}
+  def handle_init(_ctx, opts) do
+    state = %{
+      decoder_ref: nil,
+      encoding: opts.encoding
+    }
 
     {[], state}
   end
@@ -44,9 +58,15 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   end
 
   @impl true
-  def handle_stream_format(:input, _stream_format, _ctx, state) do
+  def handle_stream_format(:input, stream_format, _ctx, state) do
+    encoding =
+      case stream_format do
+        %G711{encoding: encoding} -> encoding
+        %RemoteStream{} -> state.encoding
+      end
+
     with buffers <- flush_decoder_if_exists(state),
-         {:ok, new_decoder_ref} <- Native.create() do
+         {:ok, new_decoder_ref} <- Native.create(encoding) do
       stream_format = generate_stream_format(new_decoder_ref)
       actions = buffers ++ [stream_format: {:output, stream_format}]
       {actions, %{state | decoder_ref: new_decoder_ref}}

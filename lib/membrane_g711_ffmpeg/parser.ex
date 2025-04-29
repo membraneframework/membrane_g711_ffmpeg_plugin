@@ -18,39 +18,43 @@ defmodule Membrane.G711.FFmpeg.Parser do
     sample_format: :s8
   }
 
-  def_options stream_format: [
-                spec: G711.t() | nil,
-                description: """
-                The stream format of the output pad.
-                It has to be specified if `Membrane.RemoteStream` will be received on the `:input` pad.
-                """,
-                default: nil
-              ],
-              overwrite_pts?: [
-                spec: boolean(),
-                description: """
-                If set to true, the parser will add timestamps based on payload duration.
-                """,
-                default: false
-              ],
-              pts_offset: [
-                spec: non_neg_integer(),
-                description: """
-                If set to a value different than 0, the parser will start timestamps from offset.
-                It's only valid when `overwrite_pts?` is set to true.
-                """,
-                default: 0
-              ]
+  def_options(
+    stream_format: [
+      spec: G711.t() | nil,
+      description: """
+      The stream format of the output pad.
+      It has to be specified if `Membrane.RemoteStream` will be received on the `:input` pad.
+      """,
+      default: nil
+    ],
+    overwrite_pts?: [
+      spec: boolean(),
+      description: """
+      If set to true, the parser will add timestamps based on payload duration.
+      """,
+      default: false
+    ],
+    pts_offset: [
+      spec: non_neg_integer(),
+      description: """
+      If set to a value different than 0, the parser will start timestamps from offset.
+      It's only valid when `overwrite_pts?` is set to true.
+      """,
+      default: 0
+    ]
+  )
 
-  def_input_pad :input,
+  def_input_pad(:input,
     flow_control: :auto,
     accepted_format: any_of(G711, RemoteStream),
     availability: :always
+  )
 
-  def_output_pad :output,
+  def_output_pad(:output,
     flow_control: :auto,
     availability: :always,
-    accepted_format: G711
+    accepted_format: %G711{encoding: encoding} when encoding in [:PCMA, :PCMU]
+  )
 
   @impl true
   def handle_init(_ctx, options) do

@@ -6,7 +6,7 @@
 
 This package provides G.711 audio decoder, encoder and parser. The decoder and encoder are based on [ffmpeg](https://www.ffmpeg.org).
 
-At the moment, only G.711 A-law is supported.
+Both G.711 A-law (PCMA) and μ-law (PCMU) formats are supported.
 
 It is part of [Membrane Multimedia Framework](https://membrane.stream).
 
