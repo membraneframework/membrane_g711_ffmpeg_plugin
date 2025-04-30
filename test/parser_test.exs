@@ -67,5 +67,6 @@ defmodule ParserTest do
 
     assert pipeline = Pipeline.start_link_supervised!(spec: structure)
     assert_end_of_stream(pipeline, :sink)
+    Pipeline.terminate(pipeline)
   end
 end

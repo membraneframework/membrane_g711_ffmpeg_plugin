@@ -11,7 +11,7 @@ defmodule Encoder.NativeTest do
     ref_path = Path.join(@fixtures_dir, "reference.al")
 
     assert {:ok, file} = File.read(in_path)
-    assert {:ok, encoder_ref} = Native.create(:s16le)
+    assert {:ok, encoder_ref} = Native.create(:s16le, :PCMA)
     assert {:ok, iodata} = Native.encode(file, encoder_ref)
     assert {:ok, []} = Native.flush(encoder_ref)
 

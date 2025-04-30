@@ -36,8 +36,9 @@ defmodule DecoderTest do
   defp perform_decoding_test(extension, tmp_dir) do
     {in_path, ref_path, out_path} = prepare_paths(extension, tmp_dir)
 
-    pid = make_pipeline(in_path, out_path)
-    assert_end_of_stream(pid, :sink, :input, @end_of_stream_timeout_ms)
+    pipeline = make_pipeline(in_path, out_path)
+    assert_end_of_stream(pipeline, :sink, :input, @end_of_stream_timeout_ms)
+    Pipeline.terminate(pipeline)
     assert_files_equal(out_path, ref_path)
   end
 

@@ -19,27 +19,23 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   alias Membrane.G711.FFmpeg.Common
   alias Membrane.{G711, RawAudio}
 
-  def_options(
-    encoding: [
-      spec: :PCMA | :PCMU,
-      description: "G.711 encoding to use (A-law or μ-law)",
-      default: :PCMA
-    ]
-  )
+  def_options encoding: [
+                spec: :PCMA | :PCMU,
+                description: "G.711 encoding to use (A-law or μ-law)",
+                default: :PCMA
+              ]
 
-  def_input_pad(:input,
+  def_input_pad :input,
     flow_control: :auto,
     accepted_format: %RawAudio{
       channels: G711.num_channels(),
       sample_rate: G711.sample_rate(),
       sample_format: :s16le
     }
-  )
 
-  def_output_pad(:output,
+  def_output_pad :output,
     flow_control: :auto,
     accepted_format: %G711{encoding: encoding} when encoding in [:PCMA, :PCMU]
-  )
 
   @impl true
   def handle_init(_ctx, opts) do
