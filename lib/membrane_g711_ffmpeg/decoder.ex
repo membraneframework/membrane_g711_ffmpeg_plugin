@@ -15,9 +15,13 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   alias Membrane.{G711, RawAudio, RemoteStream}
 
   def_options encoding: [
-                spec: :PCMA | :PCMU,
-                description: "G.711 encoding to decode (A-law or μ-law)",
-                default: :PCMA
+                spec: :PCMA | :PCMU | nil,
+                description: """
+                G.711 encoding to decode (A-law or μ-law)
+                Be default it's obtained from the stream format
+                with the fallback to PCMA.
+                """,
+                default: nil
               ]
 
   def_input_pad :input,
@@ -57,8 +61,18 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   def handle_stream_format(:input, stream_format, _ctx, state) do
     encoding =
       case stream_format do
-        %G711{encoding: encoding} -> encoding
-        %RemoteStream{} -> state.encoding
+        %G711{encoding: encoding} ->
+          unless encoding in [nil, state.encoding] do
+            raise """
+            Encoding in the stream format (#{inspect(encoding)}) \
+            differs from the encoding specified in options (#{inspect(state.encoding)})
+            """
+          end
+
+          encoding
+
+        %RemoteStream{} ->
+          state.encoding || :PCMA
       end
 
     with buffers <- flush_decoder_if_exists(state),
