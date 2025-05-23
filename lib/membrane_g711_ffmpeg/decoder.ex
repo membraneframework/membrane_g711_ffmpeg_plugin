@@ -62,7 +62,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
     encoding =
       case stream_format do
         %G711{encoding: encoding} ->
-          unless encoding in [nil, state.encoding] do
+          unless state.encoding in [nil, encoding] do
             raise """
             Encoding in the stream format (#{inspect(encoding)}) \
             differs from the encoding specified in options (#{inspect(state.encoding)})
