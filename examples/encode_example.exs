@@ -1,6 +1,7 @@
 # Encoding example
 #
 # The following pipeline takes a raw audio file and encodes it as G.711 A-law.
+# Use `--encoding` option to choose between `ALAW` (default) or `ULAW` variants
 
 Logger.configure(level: :info)
 
@@ -10,23 +11,27 @@ Mix.install([
   :membrane_raw_audio_parser_plugin,
   :membrane_raw_audio_format,
   :membrane_file_plugin,
-  :req
+  :membrane_hackney_plugin
 ])
-
-raw_audio =
-  Req.get!(
-    "https://raw.githubusercontent.com/membraneframework/static/gh-pages/samples/beep-s16le-8kHz-mono.raw"
-  ).body
-
-File.write!("input.raw", raw_audio)
 
 defmodule Encoding.Pipeline do
   use Membrane.Pipeline
 
   @impl true
-  def handle_init(_ctx, _opts) do
+  def handle_init(_ctx, opts) do
+    encoding = opts[:encoding]
+
+    ext =
+      case encoding do
+        :PCMA -> "al"
+        :PCMU -> "ul"
+      end
+
+    url =
+      "https://raw.githubusercontent.com/membraneframework/static/gh-pages/samples/beep-s16le-8kHz-mono.raw"
+
     structure =
-      child(:source, %Membrane.File.Source{chunk_size: 40_960, location: "input.raw"})
+      child(:source, %Membrane.Hackney.Source{location: url})
       |> child(:parser, %Membrane.RawAudioParser{
         stream_format: %Membrane.RawAudio{
           sample_format: :s16le,
@@ -34,15 +39,15 @@ defmodule Encoding.Pipeline do
           channels: 1
         }
       })
-      |> child(:encoder, Membrane.G711.FFmpeg.Encoder)
-      |> child(:sink, %Membrane.File.Sink{location: "output.al"})
+      |> child(:encoder, %Membrane.G711.FFmpeg.Encoder{encoding: encoding})
+      |> child(:sink, %Membrane.File.Sink{location: "output.#{ext}"})
 
     {[spec: structure], %{}}
   end
 
   @impl true
   def handle_element_end_of_stream(:sink, _pad, _ctx, state) do
-    {[terminate: :shutdown], state}
+    {[terminate: :normal], state}
   end
 
   @impl true
@@ -51,12 +56,16 @@ defmodule Encoding.Pipeline do
   end
 end
 
+{opts, _rest} = OptionParser.parse!(System.argv(), strict: [encoding: :string])
+encoding = opts |> Keyword.get(:encoding, "PCMA") |> String.upcase() |> String.to_existing_atom()
+
 # Start and monitor the pipeline
-{:ok, _supervisor_pid, pipeline_pid} = Membrane.Pipeline.start_link(Encoding.Pipeline)
+{:ok, _supervisor_pid, pipeline_pid} =
+  Membrane.Pipeline.start_link(Encoding.Pipeline, encoding: encoding)
+
 ref = Process.monitor(pipeline_pid)
 
 # Wait for the pipeline to finish
 receive do
-  {:DOWN, ^ref, :process, _pipeline_pid, _reason} ->
-    System.stop()
+  {:DOWN, ^ref, :process, _pipeline_pid, _reason} -> :ok
 end

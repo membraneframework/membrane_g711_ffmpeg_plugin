@@ -6,7 +6,7 @@
 
 This package provides G.711 audio decoder, encoder and parser. The decoder and encoder are based on [ffmpeg](https://www.ffmpeg.org).
 
-At the moment, only G.711 A-law is supported.
+Both G.711 A-law (PCMA) and μ-law (PCMU) formats are supported.
 
 It is part of [Membrane Multimedia Framework](https://membrane.stream).
 
@@ -17,7 +17,7 @@ The package can be installed by adding `membrane_g711_ffmpeg_plugin` to your lis
 ```elixir
 def deps do
   [
-    {:membrane_g711_ffmpeg_plugin, "~> 0.1.1"}
+    {:membrane_g711_ffmpeg_plugin, "~> 0.1.2"}
   ]
 end
 ```

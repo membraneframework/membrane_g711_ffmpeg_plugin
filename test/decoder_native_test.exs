@@ -11,7 +11,7 @@ defmodule Decoder.NativeTest do
     ref_path = Path.join(@fixtures_dir, "reference-s16le.raw")
 
     assert {:ok, file} = File.read(in_path)
-    assert {:ok, decoder_ref} = Native.create()
+    assert {:ok, decoder_ref} = Native.create(:PCMA)
     assert {:ok, iodata} = Native.decode(file, decoder_ref)
     assert {:ok, []} = Native.flush(decoder_ref)
 

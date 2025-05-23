@@ -36,8 +36,9 @@ defmodule DecoderTest do
   defp perform_decoding_test(extension, tmp_dir) do
     {in_path, ref_path, out_path} = prepare_paths(extension, tmp_dir)
 
-    pid = make_pipeline(in_path, out_path)
-    assert_end_of_stream(pid, :sink, :input, @end_of_stream_timeout_ms)
+    pipeline = make_pipeline(in_path, out_path)
+    assert_end_of_stream(pipeline, :sink, :input, @end_of_stream_timeout_ms)
+    Pipeline.terminate(pipeline)
     assert_files_equal(out_path, ref_path)
   end
 
@@ -45,6 +46,10 @@ defmodule DecoderTest do
     @describetag :tmp_dir
     test "decode a 21s long A-law file", ctx do
       perform_decoding_test("al", ctx.tmp_dir)
+    end
+
+    test "decode a 21s long U-law file", ctx do
+      perform_decoding_test("ul", ctx.tmp_dir)
     end
   end
 end

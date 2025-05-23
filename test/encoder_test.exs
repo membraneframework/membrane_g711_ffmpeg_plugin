@@ -44,8 +44,9 @@ defmodule EncoderTest do
   defp perform_encoding_test(extension, tmp_dir) do
     {in_path, ref_path, out_path} = prepare_paths(extension, tmp_dir)
 
-    pid = make_pipeline(in_path, out_path)
-    assert_end_of_stream(pid, :sink, :input, @end_of_stream_timeout_ms)
+    pipeline = make_pipeline(in_path, out_path)
+    assert_end_of_stream(pipeline, :sink, :input, @end_of_stream_timeout_ms)
+    Pipeline.terminate(pipeline)
     assert_files_equal(out_path, ref_path)
   end
 
@@ -53,6 +54,10 @@ defmodule EncoderTest do
     @describetag :tmp_dir
     test "encode a 21s long raw s16le file to A-law", ctx do
       perform_encoding_test("al", ctx.tmp_dir)
+    end
+
+    test "encode a 21s long raw s16le file to U-law", ctx do
+      perform_encoding_test("ul", ctx.tmp_dir)
     end
   end
 end

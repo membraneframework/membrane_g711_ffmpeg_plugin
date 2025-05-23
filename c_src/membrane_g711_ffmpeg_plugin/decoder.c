@@ -8,7 +8,7 @@ void handle_destroy_state(UnifexEnv *env, State *state) {
   }
 }
 
-UNIFEX_TERM create(UnifexEnv *env) {
+UNIFEX_TERM create(UnifexEnv *env, char *encoding) {
   UNIFEX_TERM res;
   State *state = unifex_alloc_state(env);
   state->codec_ctx = NULL;
@@ -18,7 +18,18 @@ UNIFEX_TERM create(UnifexEnv *env) {
 #if (LIBAVCODEC_VERSION_MAJOR < 58)
   avcodec_register_all();
 #endif
-  const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_PCM_ALAW);
+
+  enum AVCodecID codec_id;
+  if (strcmp(encoding, "PCMA") == 0) {
+    codec_id = AV_CODEC_ID_PCM_ALAW;
+  } else if (strcmp(encoding, "PCMU") == 0) {
+    codec_id = AV_CODEC_ID_PCM_MULAW;
+  } else {
+    res = create_result_error(env, "encoding");
+    goto exit_create;
+  }
+
+  const AVCodec *codec = avcodec_find_decoder(codec_id);
   if (!codec) {
     res = create_result_error(env, "nocodec");
     goto exit_create;
