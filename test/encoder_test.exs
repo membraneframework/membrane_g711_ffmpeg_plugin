@@ -56,7 +56,6 @@ defmodule EncoderTest do
       perform_encoding_test("al", ctx.tmp_dir)
     end
 
-    @describetag :tmp_dir
     test "encode a 21s long raw s16le file to U-law", ctx do
       perform_encoding_test("ul", ctx.tmp_dir)
     end

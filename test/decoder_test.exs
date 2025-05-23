@@ -48,7 +48,6 @@ defmodule DecoderTest do
       perform_decoding_test("al", ctx.tmp_dir)
     end
 
-    @describetag :tmp_dir
     test "decode a 21s long U-law file", ctx do
       perform_decoding_test("ul", ctx.tmp_dir)
     end
