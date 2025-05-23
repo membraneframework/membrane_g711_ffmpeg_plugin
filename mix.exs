@@ -1,7 +1,7 @@
 defmodule Membrane.G711.FFmpeg.Mixfile do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.1.2"
   @github_url "https://github.com/jellyfish-dev/membrane_g711_ffmpeg_plugin"
 
   def project do
