@@ -47,10 +47,23 @@ defmodule Membrane.G711.FFmpeg.Decoder do
   end
 
   @impl true
-  def handle_buffer(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, %Buffer{pts: input_pts} = buffer, ctx, state) do
     case Native.decode(buffer.payload, state.decoder_ref) do
       {:ok, frames} ->
-        {Common.wrap_frames(frames), state}
+        {buffers, _pts} =
+          frames
+          |> Enum.map_reduce(input_pts, fn frame, current_pts ->
+            buffer = %Buffer{payload: frame, pts: current_pts}
+
+            pts_diff =
+              frame
+              |> byte_size()
+              |> Membrane.RawAudio.bytes_to_time(ctx.pads.output.stream_format)
+
+            {buffer, current_pts + pts_diff}
+          end)
+
+        {buffers, state}
 
       {:error, reason} ->
         raise "Native decoder failed to decode the payload: #{inspect(reason)}"
