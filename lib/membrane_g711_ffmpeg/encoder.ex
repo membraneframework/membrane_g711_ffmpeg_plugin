@@ -16,7 +16,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   require Membrane.G711
 
   alias __MODULE__.Native
-  alias Membrane.G711.FFmpeg.Common
+  alias Membrane.Buffer
   alias Membrane.{G711, RawAudio}
 
   def_options encoding: [
@@ -41,17 +41,20 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   def handle_init(_ctx, opts) do
     state = %{
       encoder_ref: nil,
-      encoding: opts.encoding
+      encoding: opts.encoding,
+      next_pts: nil
     }
 
     {[], state}
   end
 
   @impl true
-  def handle_buffer(:input, buffer, _ctx, state) do
+  def handle_buffer(:input, buffer, ctx, state) do
+    state = %{state | next_pts: buffer.pts}
+
     case Native.encode(buffer.payload, state.encoder_ref) do
       {:ok, frames} ->
-        {Common.wrap_frames(frames), state}
+        frames_to_buffers(frames, ctx.pads.output.stream_format, state)
 
       {:error, reason} ->
         raise "Native encoder failed to encode the payload: #{inspect(reason)}"
@@ -59,8 +62,8 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   @impl true
-  def handle_stream_format(:input, stream_format, _ctx, state) do
-    with buffers <- flush_encoder_if_exists(state),
+  def handle_stream_format(:input, stream_format, ctx, state) do
+    with {buffers, state} <- flush_encoder_if_exists(ctx, state),
          {:ok, new_encoder_ref} <-
            Native.create(stream_format.sample_format, state.encoding) do
       stream_format = generate_stream_format(state)
@@ -72,17 +75,17 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   @impl true
-  def handle_end_of_stream(:input, _ctx, state) do
-    buffers = flush_encoder_if_exists(state)
+  def handle_end_of_stream(:input, ctx, state) do
+    {buffers, state} = flush_encoder_if_exists(ctx, state)
     actions = buffers ++ [end_of_stream: :output]
     {actions, state}
   end
 
-  defp flush_encoder_if_exists(%{encoder_ref: nil}), do: []
+  defp flush_encoder_if_exists(_ctx, %{encoder_ref: nil} = state), do: {[], state}
 
-  defp flush_encoder_if_exists(%{encoder_ref: encoder_ref}) do
+  defp flush_encoder_if_exists(ctx, %{encoder_ref: encoder_ref} = state) do
     with {:ok, frames} <- Native.flush(encoder_ref) do
-      Common.wrap_frames(frames)
+      frames_to_buffers(frames, ctx.pads.output.stream_format, state)
     else
       {:error, reason} -> raise "Native encoder failed to flush: #{inspect(reason)}"
     end
@@ -90,5 +93,30 @@ defmodule Membrane.G711.FFmpeg.Encoder do
 
   defp generate_stream_format(%{encoding: encoding}) do
     %G711{encoding: encoding}
+  end
+
+  defp frames_to_buffers(frames, stream_format, state) do
+    {buffers, state} =
+      frames
+      |> Enum.map_reduce(state, fn frame, state ->
+        buffer = %Buffer{payload: frame, pts: state.next_pts}
+        state = %{state | next_pts: bump_pts(state.next_pts, frame, stream_format)}
+        {buffer, state}
+      end)
+
+    {[buffer: {:output, buffers}], state}
+  end
+
+  defp bump_pts(nil = _old_pts, _frame, _stream_format), do: nil
+
+  defp bump_pts(old_pts, frame, stream_format) do
+    pts_diff = frame_to_time(frame, stream_format)
+    old_pts + pts_diff
+  end
+
+  defp frame_to_time(frame, %RawAudio{} = stream_format) do
+    bytes_per_sample = RawAudio.sample_size(stream_format)
+    num_samples = byte_size(frame) / (bytes_per_sample * stream_format.channels)
+    Membrane.Time.seconds(num_samples / stream_format.sample_rate)
   end
 end
