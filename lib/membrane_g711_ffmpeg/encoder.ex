@@ -115,8 +115,12 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   defp frame_to_time(frame, %RawAudio{} = stream_format) do
+    numerator = byte_size(frame)
+
     bytes_per_sample = RawAudio.sample_size(stream_format)
-    num_samples = byte_size(frame) / (bytes_per_sample * stream_format.channels)
-    Membrane.Time.seconds(num_samples / stream_format.sample_rate)
+    denominator = bytes_per_sample * stream_format.channels * stream_format.sample_rate
+
+    Ratio.new(numerator, denominator)
+    |> Membrane.Time.seconds()
   end
 end
