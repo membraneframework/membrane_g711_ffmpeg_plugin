@@ -49,7 +49,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   @impl true
-  def handle_buffer(:input, buffer, ctx, state) do
+  def handle_buffer(:input, buffer, _ctx, state) do
     state = %{state | next_pts: buffer.pts}
 
     case Native.encode(buffer.payload, state.encoder_ref) do
@@ -62,8 +62,8 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   @impl true
-  def handle_stream_format(:input, stream_format, ctx, state) do
-    with {buffers, state} <- flush_encoder_if_exists(ctx, state),
+  def handle_stream_format(:input, stream_format, _ctx, state) do
+    with {buffers, state} <- flush_encoder_if_exists(state),
          {:ok, new_encoder_ref} <-
            Native.create(stream_format.sample_format, state.encoding) do
       stream_format = generate_stream_format(state)
@@ -75,15 +75,15 @@ defmodule Membrane.G711.FFmpeg.Encoder do
   end
 
   @impl true
-  def handle_end_of_stream(:input, ctx, state) do
-    {buffers, state} = flush_encoder_if_exists(ctx, state)
+  def handle_end_of_stream(:input, _ctx, state) do
+    {buffers, state} = flush_encoder_if_exists(state)
     actions = buffers ++ [end_of_stream: :output]
     {actions, state}
   end
 
-  defp flush_encoder_if_exists(_ctx, %{encoder_ref: nil} = state), do: {[], state}
+  defp flush_encoder_if_exists(%{encoder_ref: nil} = state), do: {[], state}
 
-  defp flush_encoder_if_exists(ctx, %{encoder_ref: encoder_ref} = state) do
+  defp flush_encoder_if_exists(%{encoder_ref: encoder_ref} = state) do
     with {:ok, frames} <- Native.flush(encoder_ref) do
       frames_to_buffers(frames, state)
     else
