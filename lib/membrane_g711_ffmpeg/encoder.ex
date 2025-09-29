@@ -54,7 +54,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
 
     case Native.encode(buffer.payload, state.encoder_ref) do
       {:ok, frames} ->
-        frames_to_buffers(frames, ctx.pads.output.stream_format, state)
+        frames_to_buffers(frames, state)
 
       {:error, reason} ->
         raise "Native encoder failed to encode the payload: #{inspect(reason)}"
@@ -85,7 +85,7 @@ defmodule Membrane.G711.FFmpeg.Encoder do
 
   defp flush_encoder_if_exists(ctx, %{encoder_ref: encoder_ref} = state) do
     with {:ok, frames} <- Native.flush(encoder_ref) do
-      frames_to_buffers(frames, ctx.pads.output.stream_format, state)
+      frames_to_buffers(frames, state)
     else
       {:error, reason} -> raise "Native encoder failed to flush: #{inspect(reason)}"
     end
@@ -95,30 +95,31 @@ defmodule Membrane.G711.FFmpeg.Encoder do
     %G711{encoding: encoding}
   end
 
-  defp frames_to_buffers(frames, stream_format, state) do
+  defp frames_to_buffers(frames, state) do
     {buffers, state} =
       frames
       |> Enum.map_reduce(state, fn frame, state ->
         buffer = %Buffer{payload: frame, pts: state.next_pts}
-        state = %{state | next_pts: bump_pts(state.next_pts, frame, stream_format)}
+        state = %{state | next_pts: bump_pts(state.next_pts, frame)}
         {buffer, state}
       end)
 
     {[buffer: {:output, buffers}], state}
   end
 
-  defp bump_pts(nil = _old_pts, _frame, _stream_format), do: nil
+  defp bump_pts(nil = _old_pts, _frame), do: nil
 
-  defp bump_pts(old_pts, frame, stream_format) do
-    pts_diff = frame_to_time(frame, stream_format)
+  defp bump_pts(old_pts, frame) do
+    pts_diff = frame_to_time(frame)
     old_pts + pts_diff
   end
 
-  defp frame_to_time(frame, %RawAudio{} = stream_format) do
+  defp frame_to_time(frame) do
     numerator = byte_size(frame)
 
-    bytes_per_sample = RawAudio.sample_size(stream_format)
-    denominator = bytes_per_sample * stream_format.channels * stream_format.sample_rate
+    # G.711 uses 8 bits (1 byte) per sample
+    bytes_per_sample = 1
+    denominator = bytes_per_sample * G711.num_channels() * G711.sample_rate()
 
     Ratio.new(numerator, denominator)
     |> Membrane.Time.seconds()
