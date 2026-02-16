@@ -94,18 +94,16 @@ defmodule Membrane.G711.FFmpeg.Parser do
   end
 
   @impl true
-  def handle_buffer(:input, buffer, _ctx, %{overwrite_pts?: overwrite_pts?} = state) do
-    parsed_payload = buffer.payload
-
-    if parsed_payload == <<>> do
+  def handle_buffer(:input, %Buffer{} = buffer, _ctx, state) do
+    if buffer.payload == <<>> do
       {[], state}
     else
-      parsed_buffer = %Buffer{buffer | payload: parsed_payload}
+      {buffer, state} =
+        if state.overwrite_pts?,
+          do: overwrite_pts(buffer, state),
+          else: {buffer, state}
 
-      {parsed_buffer, state} =
-        if overwrite_pts?, do: overwrite_pts(parsed_buffer, state), else: {parsed_buffer, state}
-
-      {[buffer: {:output, parsed_buffer}], state}
+      {[buffer: {:output, buffer}], state}
     end
   end
 

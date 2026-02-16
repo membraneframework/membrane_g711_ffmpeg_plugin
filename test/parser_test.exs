@@ -6,9 +6,9 @@ defmodule ParserTest do
 
   require Membrane.G711
 
+  alias Membrane.{Buffer, G711, RawAudio, Time}
   alias Membrane.G711.FFmpeg.Parser
   alias Membrane.Testing.{Pipeline, Sink, Source}
-  alias Membrane.{Buffer, G711, RawAudio, Time}
 
   @faux_stream_format %RawAudio{
     channels: G711.num_channels(),
