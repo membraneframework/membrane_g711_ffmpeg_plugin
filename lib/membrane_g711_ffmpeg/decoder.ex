@@ -53,7 +53,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
 
     case Native.decode(buffer.payload, state.decoder_ref) do
       {:ok, frames} ->
-        frames_to_buffers(frames, ctx.pads.output.stream_format, state)
+        frames_to_buffers(frames, buffer.metadata, ctx.pads.output.stream_format, state)
 
       {:error, reason} ->
         raise "Native decoder failed to decode the payload: #{inspect(reason)}"
@@ -99,7 +99,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
 
   defp flush_decoder_if_exists(ctx, %{decoder_ref: decoder_ref} = state) do
     with {:ok, frames} <- Native.flush(decoder_ref) do
-      frames_to_buffers(frames, ctx.pads.output.stream_format, state)
+      frames_to_buffers(frames, nil, ctx.pads.output.stream_format, state)
     else
       {:error, reason} -> raise "Native decoder failed to flush: #{inspect(reason)}"
     end
@@ -113,15 +113,15 @@ defmodule Membrane.G711.FFmpeg.Decoder do
         sample_format: sample_format
       }
     else
-      {:error, reason} -> raise "Native encoder failed to provide metadata: #{inspect(reason)}"
+      {:error, reason} -> raise "Native decoder failed to provide metadata: #{inspect(reason)}"
     end
   end
 
-  defp frames_to_buffers(frames, stream_format, state) do
+  defp frames_to_buffers(frames, metadata, stream_format, state) do
     {buffers, state} =
       frames
       |> Enum.map_reduce(state, fn frame, state ->
-        buffer = %Buffer{payload: frame, pts: state.next_pts}
+        buffer = %Buffer{payload: frame, pts: state.next_pts, metadata: metadata}
         state = %{state | next_pts: bump_pts(state.next_pts, frame, stream_format)}
         {buffer, state}
       end)
