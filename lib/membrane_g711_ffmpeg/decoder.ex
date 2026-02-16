@@ -99,7 +99,7 @@ defmodule Membrane.G711.FFmpeg.Decoder do
 
   defp flush_decoder_if_exists(ctx, %{decoder_ref: decoder_ref} = state) do
     with {:ok, frames} <- Native.flush(decoder_ref) do
-      frames_to_buffers(frames, nil, ctx.pads.output.stream_format, state)
+      frames_to_buffers(frames, %{}, ctx.pads.output.stream_format, state)
     else
       {:error, reason} -> raise "Native decoder failed to flush: #{inspect(reason)}"
     end
