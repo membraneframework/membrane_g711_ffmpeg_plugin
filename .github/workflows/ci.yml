@@ -18,7 +18,7 @@ jobs:
   run_examples:
     runs-on: ubuntu-latest
     container:
-      image: membraneframeworklabs/docker_membrane:v2.2.0
+      image: membraneframeworklabs/docker_membrane:v2.9.1
       env:
         ASDF_DATA_DIR: /root/.asdf
     steps:
