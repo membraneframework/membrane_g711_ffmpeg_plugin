@@ -33,7 +33,7 @@ defmodule Encoding.Pipeline do
     structure =
       child(:source, %Membrane.Hackney.Source{location: url})
       |> child(:parser, %Membrane.RawAudioParser{
-        stream_format: %Membrane.RawAudio{
+        assumed_input_stream_format: %Membrane.RawAudio{
           sample_format: :s16le,
           sample_rate: 8000,
           channels: 1
