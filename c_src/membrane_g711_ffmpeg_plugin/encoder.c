@@ -112,9 +112,17 @@ UNIFEX_TERM encode(UnifexEnv *env, UnifexPayload *payload, State *state) {
   int max_frames = 16, frame_cnt = 0;
   UnifexPayload **out_frames = NULL;
 
+  int bytes_per_sample = av_get_bytes_per_sample(state->codec_ctx->sample_fmt);
+  if (payload->size % bytes_per_sample != 0) {
+    return encode_result_error(env, "invalid_frame_size");
+  }
+  if (payload->size == 0) {
+    return encode_result_ok(env, NULL, 0);
+  }
+
   AVFrame *frame = av_frame_alloc();
 
-  frame->nb_samples = payload->size / av_get_bytes_per_sample(state->codec_ctx->sample_fmt);
+  frame->nb_samples = payload->size / bytes_per_sample;
   frame->format = state->codec_ctx->sample_fmt;
 #if (LIBAVCODEC_VERSION_MAJOR < 59 || (LIBAVCODEC_VERSION_MAJOR == 59 && LIBAVCODEC_VERSION_MINOR < 24))
   frame->channels = state->codec_ctx->channels;

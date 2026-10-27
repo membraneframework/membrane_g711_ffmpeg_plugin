@@ -24,4 +24,11 @@ defmodule Encoder.NativeTest do
     assert byte_size(out_file) == byte_size(ref_file)
     assert out_file == ref_file
   end
+
+  test "Empty and misaligned payloads" do
+    assert {:ok, encoder_ref} = Native.create(:s16le, :PCMA)
+    assert {:ok, []} = Native.encode(<<>>, encoder_ref)
+    assert {:error, :invalid_frame_size} = Native.encode(<<0>>, encoder_ref)
+    assert {:ok, [_frame]} = Native.encode(<<0, 0>>, encoder_ref)
+  end
 end
